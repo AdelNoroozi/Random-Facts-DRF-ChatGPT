@@ -7,6 +7,6 @@ router = routers.DefaultRouter()
 router.register('', FactViewSet)
 
 urlpatterns = [
-    path('', include(router.urls)),
+
     path('generate-fact/', GenerateFact.as_view(), name='generate_fact'),
-]
+    path('', include(router.urls)), ]

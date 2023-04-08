@@ -8,6 +8,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from facts.models import Fact
 from facts.serializers import FactSerializer
+from difflib import SequenceMatcher
 
 
 class GenerateFact(APIView):
@@ -40,9 +41,27 @@ class GenerateFact(APIView):
             presence_penalty=0.0
         )
         fact_text = (ai_response['choices'][0]['text']).strip()
-        fact = Fact.objects.create(topic=topic, fact=fact_text, creator=creator)
-        serializer = FactSerializer(fact)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        # fact = Fact.objects.create(topic=topic, fact=fact_text, creator=creator)
+        try:
+            last_fact_id = request.data['last_fact_id']
+        except:
+            fact = Fact.objects.create(topic=topic, fact=fact_text, creator=creator)
+            serializer = FactSerializer(fact)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            if not Fact.objects.filter(id=last_fact_id).exists():
+                response = {'message': 'last fact id is invalid!'}
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                last_fact = Fact.objects.get(id=last_fact_id)
+                facts_similarity = SequenceMatcher(None, fact_text, last_fact.fact).ratio()
+                if facts_similarity >= 0.6:
+                    response = {'message': 'sorry, no more facts available!'}
+                    return Response(response, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    fact = Fact.objects.create(topic=topic, fact=fact_text, creator=creator)
+                    serializer = FactSerializer(fact)
+                    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class FactViewSet(mixins.RetrieveModelMixin,
