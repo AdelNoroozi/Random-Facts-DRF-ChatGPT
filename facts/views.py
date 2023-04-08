@@ -1,9 +1,10 @@
 from django.shortcuts import render
 import openai
-from rest_framework import status
+from rest_framework import status, mixins
 from rest_framework.response import Response
 
 from rest_framework.views import APIView
+from rest_framework.viewsets import GenericViewSet
 
 from facts.models import Fact
 from facts.serializers import FactSerializer
@@ -27,7 +28,7 @@ class GenerateFact(APIView):
         else:
             response = {'message': 'invalid frequency!'}
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
-        openai.api_key = "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"
+        openai.api_key = ""
         openai.Model.list()
         ai_response = openai.Completion.create(
             model="text-davinci-003",
@@ -42,3 +43,11 @@ class GenerateFact(APIView):
         fact = Fact.objects.create(topic=topic, fact=fact_text, creator=creator)
         serializer = FactSerializer(fact)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class FactViewSet(mixins.RetrieveModelMixin,
+                  mixins.ListModelMixin,
+                  mixins.DestroyModelMixin,
+                  GenericViewSet):
+    queryset = Fact.objects.all()
+    serializer_class = FactSerializer
