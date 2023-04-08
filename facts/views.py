@@ -5,16 +5,19 @@ from rest_framework.response import Response
 
 from rest_framework.views import APIView
 
+from facts.models import Fact
+from facts.serializers import FactSerializer
+
 
 class GenerateFact(APIView):
     def post(self, request):
         try:
             topic = request.data['topic']
             frequency = int(request.data['frequency'])
+            creator = request.data['creator']
         except:
             response = {'message': 'field error!'}
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
-        new_fact_flag = ""
         if frequency == 1:
             new_fact_flag = "a"
         elif frequency == 2:
@@ -24,7 +27,7 @@ class GenerateFact(APIView):
         else:
             response = {'message': 'invalid frequency!'}
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
-        openai.api_key = ""
+        openai.api_key = "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"
         openai.Model.list()
         ai_response = openai.Completion.create(
             model="text-davinci-003",
@@ -35,4 +38,7 @@ class GenerateFact(APIView):
             frequency_penalty=0.0,
             presence_penalty=0.0
         )
-        return Response({"response": ai_response}, status= status.HTTP_200_OK)
+        fact_text = (ai_response['choices'][0]['text']).strip()
+        fact = Fact.objects.create(topic=topic, fact=fact_text, creator=creator)
+        serializer = FactSerializer(fact)
+        return Response(serializer.data, status=status.HTTP_200_OK)
