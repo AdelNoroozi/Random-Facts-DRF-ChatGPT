@@ -1,4 +1,5 @@
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
@@ -35,8 +36,9 @@ class UserManager(BaseUserManager):
 class Admin(AbstractUser):
     modified_at = models.DateTimeField(auto_now=True, null=True)
 
-    objects = UserManager()
+    USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []
+    objects = UserManager()
 
     def __str__(self):
         return self.username

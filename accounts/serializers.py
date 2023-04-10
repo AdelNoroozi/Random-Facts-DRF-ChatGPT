@@ -1,3 +1,4 @@
+from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
 from accounts.models import Admin
@@ -10,8 +11,12 @@ class AddAdminSerializer(serializers.ModelSerializer):
         model = Admin
         fields = ('username', 'password', 'first_name', 'last_name', 'email')
 
+    def validate(self, attrs):
+        validate_password(attrs.get('password'))
+        return attrs
+
     def create(self, validated_data):
-        admin = self.Meta.model.objects.create_admin()
+        admin = self.Meta.model.objects.create_admin(**self.validated_data)
         return admin
 
 

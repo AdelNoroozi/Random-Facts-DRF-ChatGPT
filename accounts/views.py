@@ -1,12 +1,12 @@
 from django.shortcuts import render
 from rest_framework import mixins
+from rest_framework.generics import CreateAPIView
 from rest_framework.viewsets import GenericViewSet
 
 from accounts.serializers import *
 
 
 class AdminViewSet(mixins.ListModelMixin,
-                   mixins.CreateModelMixin,
                    mixins.RetrieveModelMixin,
                    GenericViewSet):
     queryset = Admin.objects.all()
@@ -16,5 +16,8 @@ class AdminViewSet(mixins.ListModelMixin,
             return AdminMiniSerializer
         elif self.action == 'retrieve':
             return AdminSerializer
-        elif self.action == 'create':
-            return AddAdminSerializer
+
+
+class AddAdminView(CreateAPIView):
+    serializer_class = AddAdminSerializer
+    queryset = Admin.objects.all()
