@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
+from accounts.permissions import FactViewSetPermissions
 from facts.models import Fact
 from facts.serializers import FactSerializer
 from difflib import SequenceMatcher
@@ -70,3 +71,4 @@ class FactViewSet(mixins.RetrieveModelMixin,
                   GenericViewSet):
     queryset = Fact.objects.all()
     serializer_class = FactSerializer
+    permission_classes = (FactViewSetPermissions,)
