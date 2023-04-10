@@ -4,6 +4,7 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.viewsets import GenericViewSet
 
 # from accounts.permissions import IsAdmin
+from accounts.permissions import IsSuperUser
 from accounts.serializers import *
 
 
@@ -22,3 +23,4 @@ class AdminViewSet(mixins.ListModelMixin,
 class AddAdminView(CreateAPIView):
     serializer_class = AddAdminSerializer
     queryset = Admin.objects.all()
+    permission_classes = (IsSuperUser,)
