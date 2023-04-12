@@ -23,7 +23,7 @@ class AdminViewSet(mixins.ListModelMixin,
     def get_serializer_class(self):
         if self.action == 'list':
             return AdminMiniSerializer
-        elif self.action == 'retrieve':
+        else:
             return AdminSerializer
 
     @action(detail=True, methods=['PATCH', ])
