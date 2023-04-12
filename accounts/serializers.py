@@ -32,3 +32,21 @@ class AdminMiniSerializer(serializers.ModelSerializer):
         model = Admin
         fields = ('id', 'username', 'is_active')
         read_only_fields = ('id', 'username', 'is_active')
+
+
+class ChangePasswordSerializer(serializers.ModelSerializer):
+    current_password = serializers.CharField(
+        write_only=True,
+        required=True,
+        style={'input_type': 'password'}
+    )
+
+    new_password = serializers.CharField(
+        write_only=True,
+        required=True,
+        style={'input_type': 'password'}
+    )
+
+    class Meta:
+        model = Admin
+        fields = ('current_password', 'new_password')
